@@ -1,7 +1,6 @@
-package repository;
+package com.analytics.analyticsserver.repository;
 
-import model.Customer;
-import org.springframework.data.mongodb.core.mapping.Document;
+import com.analytics.analyticsserver.model.Customer;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 

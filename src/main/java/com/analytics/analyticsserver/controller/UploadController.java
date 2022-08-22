@@ -1,7 +1,6 @@
 package com.analytics.analyticsserver.controller;
 
-import helper.CustomerHelper;
-import lombok.RequiredArgsConstructor;
+import com.analytics.analyticsserver.helper.CustomerHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

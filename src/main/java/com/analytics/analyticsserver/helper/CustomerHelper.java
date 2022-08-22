@@ -1,8 +1,8 @@
-package helper;
+package com.analytics.analyticsserver.helper;
 
 import com.google.gson.Gson;
-import model.Customer;
-import model.ErrorCustom;
+import com.analytics.analyticsserver.model.Customer;
+import com.analytics.analyticsserver.model.ErrorCustom;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
-import repository.CustomerRepository;
+import com.analytics.analyticsserver.repository.CustomerRepository;
 
 import java.io.IOException;
 import java.io.InputStream;

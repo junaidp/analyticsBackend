@@ -1,4 +1,4 @@
-package model;
+package com.analytics.analyticsserver.model;
 
 public class ErrorCustom {
 
