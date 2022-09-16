@@ -11,21 +11,19 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoOperations;
-import org.springframework.data.support.PageableExecutionUtils;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import com.analytics.analyticsserver.repository.CustomerRepository;
 
-import javax.management.Query;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component
 public class CustomerHelper {
@@ -50,6 +48,40 @@ public class CustomerHelper {
             throw new RuntimeException("fail to store excel data: " + e.getMessage());
         }
         return gson.toJson(response);
+    }
+
+    public String getEmptyJCCodes(){
+        try{
+//            List<Customer> customerList1 = mongoOperation.findAll(Customer.class);
+            List<Customer> customerList = mongoOperation.find(new Query(Criteria.where("jcCode").regex("\\A(?!\\s*\\Z).+")), Customer.class);
+            Pattern pattern = Pattern.compile("\\A(?!\\s*\\Z).+");
+            List<Customer> customerList1 = mongoOperation.find(new Query(Criteria.where("jcCode").regex("/^$/")), Customer.class);
+            return gson.toJson(customerList);
+        }catch (Exception ex){
+            logger.info("Excption in getting Empty JC Codes: "+ex.getMessage());
+            return gson.toJson("Excption in getting Empty JC Codes: "+ex.getMessage());
+        }
+    }
+
+    
+    //duplicate
+    private <T> Set<Customer> findDuplicateInStream(Stream<Customer> customerList)
+    {
+        Set<Customer> items = new HashSet<>();
+        return customerList
+                .filter(n -> !items.add(n)) // Set.add() returns false if the element was already in the set.
+                .collect(Collectors.toSet());
+    }
+    
+    public String getDulicateJCCodes(){
+        try{
+            List<Customer> customerList = mongoOperation.findAll(Customer.class);
+            Set<Customer> result = findDuplicateInStream(customerList.stream());
+            return gson.toJson("");
+        }catch (Exception ex){
+            logger.info("Excption in getting Duplicate JC Codes: "+ex.getMessage());
+            return gson.toJson("Excption in getting Duplicate JC Codes: "+ex.getMessage());
+        }
     }
 
     //reading from uploaded excel file

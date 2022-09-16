@@ -8,7 +8,8 @@ import java.util.List;
 
 public interface CustomerRepository extends MongoRepository<Customer, String> {
 
-    @Query("{ 'userId' : ?0'}")
-    List<Customer> findCustomerByName(String userId);
+    @Query("{ 'jcCode' : ?0'}")
+    List<Customer> findByAmtIsNull(String jcCode);
+
 
 }

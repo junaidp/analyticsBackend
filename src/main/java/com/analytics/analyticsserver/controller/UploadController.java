@@ -37,6 +37,16 @@ public class UploadController {
         }
     }
 
+    @GetMapping("/getEmptyJCCodes")
+    public String getEmptyJCCodes(){
+        return customerHelper.getEmptyJCCodes();
+    }
+
+    @GetMapping("/getDulicateJCCodes")
+    public String getDulicateJCCodes(){
+        return customerHelper.getDulicateJCCodes();
+    }
+
     @GetMapping("/getAllCustomersPage")
     public ResponseEntity<Map<String, Object>> getAllCustomersPage(
             @RequestParam(required = false) String custDescription,
