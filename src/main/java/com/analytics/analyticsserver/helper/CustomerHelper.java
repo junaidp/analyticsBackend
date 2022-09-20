@@ -1,8 +1,9 @@
 package com.analytics.analyticsserver.helper;
 
-import com.google.gson.Gson;
 import com.analytics.analyticsserver.model.Customer;
 import com.analytics.analyticsserver.model.ErrorCustom;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -23,17 +24,17 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Component
 public class CustomerHelper {
 
     @Autowired
-     CustomerRepository repository;
+    CustomerRepository repository;
     @Autowired
     MongoOperations mongoOperation;
     static String SHEET = "Control sheet";
-    private Gson gson = new Gson();
+    GsonBuilder gsonBuilder = new GsonBuilder();
+    Gson gson = gsonBuilder.create();
     private Logger logger = LoggerFactory.getLogger(Customer.class);
 
     public String saveAll(MultipartFile file) {
@@ -59,28 +60,66 @@ public class CustomerHelper {
             return gson.toJson(customerList);
         }catch (Exception ex){
             logger.info("Excption in getting Empty JC Codes: "+ex.getMessage());
-            return gson.toJson("Excption in getting Empty JC Codes: "+ex.getMessage());
+            return gson.toJson("Exception in getting Empty JC Codes: "+ex.getMessage());
         }
     }
 
-    
     //duplicate
-    private <T> Set<Customer> findDuplicateInStream(Stream<Customer> customerList)
-    {
-        Set<Customer> items = new HashSet<>();
-        return customerList
-                .filter(n -> !items.add(n)) // Set.add() returns false if the element was already in the set.
+    private <T> Set<Customer> findDuplicateInStream(List<Customer> customerList) {
+        Set<Customer> duplicateCompanies = customerList
+                .stream()
+                .filter(customer -> Collections.frequency(customerList, customer.getCustDescription()) > 1)
                 .collect(Collectors.toSet());
+        return duplicateCompanies;
+    }
+
+    public String getDulicateService(){
+        List<Customer> customers = new ArrayList();
+        try{
+            List<Customer> customerList = mongoOperation.findAll(Customer.class);
+            for(int i=0; i<customerList.size(); i++){
+                for(int j=1; i<customerList.size(); i++) {
+                    int count = 0;
+                    if (customerList.get(i).getService().equals(customerList.get(j).getService())
+                    && !customerList.get(i).getTotalAmount().equals(customerList.get(j).getTotalAmount())){
+                        if(count == 0) //add once
+                            customers.add(customerList.get(i));
+                        customers.add(customerList.get(j));
+                        customerList.remove(i);
+                        customerList.remove(j);
+                        count++;
+                    }
+                }
+            }
+            return gson.toJson(customers);
+        }catch (Exception ex){
+            logger.info("Exception in getting Duplicate Service: "+ex.getMessage());
+            return gson.toJson("Exception in getting Duplicate Service: "+ex.getMessage());
+        }
     }
     
     public String getDulicateJCCodes(){
+        List<Customer> list = new ArrayList();
         try{
             List<Customer> customerList = mongoOperation.findAll(Customer.class);
-            Set<Customer> result = findDuplicateInStream(customerList.stream());
-            return gson.toJson("");
+            for(int i=0; i<customerList.size(); i++){
+                for(int j=1; i<customerList.size(); i++) {
+                    int count = 0;
+                    if (customerList.get(i).getJcCode().equals(customerList.get(j).getJcCode())){
+                        if(count == 0)
+                            list.add(customerList.get(i));
+                        list.add(customerList.get(j));
+                        customerList.remove(i);
+                        customerList.remove(j);
+                        count++;
+                    }
+                }
+            }
+//            Set<Customer> result = findDuplicateInStream(customerList);
+            return gson.toJson(list);
         }catch (Exception ex){
-            logger.info("Excption in getting Duplicate JC Codes: "+ex.getMessage());
-            return gson.toJson("Excption in getting Duplicate JC Codes: "+ex.getMessage());
+            logger.info("Exception in getting Duplicate JC Codes: "+ex.getMessage());
+            return gson.toJson("Exception in getting Duplicate JC Codes: "+ex.getMessage());
         }
     }
 

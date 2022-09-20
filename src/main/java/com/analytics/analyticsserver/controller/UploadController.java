@@ -44,7 +44,13 @@ public class UploadController {
 
     @GetMapping("/getDulicateJCCodes")
     public String getDulicateJCCodes(){
-        return customerHelper.getDulicateJCCodes();
+        String msg = customerHelper.getDulicateJCCodes();
+        return msg;
+    }
+
+    @GetMapping("/getDulicateService")
+    public String getDulicateService(){
+        return customerHelper.getDulicateService();
     }
 
     @GetMapping("/getAllCustomersPage")
